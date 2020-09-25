@@ -1,17 +1,28 @@
 ﻿using CSharp.Models;
+using CSharp.Service;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 
 namespace CSharp.Controllers
 {
 	[ApiController]
 	[Route("order")]
 	public class OrderAPI : ControllerBase
-	{		
+	{
+
+		private IOrderManager _orderManager = null;
+
+		public OrderAPI(IOrderManager orderManager)
+		{
+			this._orderManager = orderManager;
+		}
+
 		[HttpGet]
 		[Route("listall")]
-		public string ListAllOrders()
+		public IActionResult ListAllOrders()
 		{
-			return "All Orders: ...";
+			List<Order> _allOrders = this._orderManager.GetAllOrders();
+			return Ok(_allOrders);
 		}
 
 		[HttpPost]
@@ -30,9 +41,17 @@ namespace CSharp.Controllers
 
 		[HttpPost]
 		[Route("cancel")]
-		public string CancelOrder([FromQuery] int orderId)
+		public IActionResult CancelOrder([FromQuery] int orderId)
 		{
-			return $"Order: {orderId} canceled";
+			Response _response = this._orderManager.CancelOrder(orderId);
+			if (_response.IsSuccess)
+			{
+				return Ok(_response);
+			}
+			else
+			{
+				return NotFound(_response);
+			}
 		}
 	}
 

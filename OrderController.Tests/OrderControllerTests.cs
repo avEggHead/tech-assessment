@@ -2,25 +2,65 @@ using Xunit;
 using CSharp.Controllers;
 using CSharp.Models;
 using static CSharp.Models.Order;
+using CSharp.Service;
+using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Net;
 
 namespace OrderController.Tests
 {
     public class OrderControllerTests
     {
         [Fact]
-        public void OrderController_ListAll_ReturnListAllMessage()
+        public void OrderController_ListAll_ReturnsStatusOkAndList()
         {
-            OrderAPI _controller = new OrderAPI();
+            IOrderManager orderManager = new OrderManager();
+            OrderAPI _controller = new OrderAPI(orderManager);
 
-            string _response = _controller.ListAllOrders();
+            IActionResult _response = _controller.ListAllOrders();
+            OkObjectResult _okObject = _response as OkObjectResult;
+            List<Order> _results = _okObject.Value as List<Order>;
 
-            Assert.Equal("All Orders: ...", _response);
+            Assert.NotNull(_response);
+            Assert.Equal((int)HttpStatusCode.OK, _okObject.StatusCode);
+            Assert.Equal(4, _results.Count);
+        }
+
+        [Fact]
+        public void OrderController_CancelOrder_OrderNotFound()
+        {
+            IOrderManager orderManager = new OrderManager();
+            OrderAPI _controller = new OrderAPI(orderManager);
+
+            int _orderId = 123;
+
+            IActionResult _response = _controller.CancelOrder(_orderId);
+            NotFoundObjectResult _notFoundObject = _response as NotFoundObjectResult;
+
+            Assert.NotNull(_response);
+            Assert.Equal((int)HttpStatusCode.NotFound, _notFoundObject.StatusCode);
+        }
+
+        [Fact]
+        public void OrderController_CancelOrder_OrderFound()
+        {
+            IOrderManager orderManager = new OrderManager();
+            OrderAPI _controller = new OrderAPI(orderManager);
+
+            int _orderId = 1;
+
+            IActionResult _response = _controller.CancelOrder(_orderId);
+            OkObjectResult _okObject = _response as OkObjectResult;
+
+            Assert.NotNull(_response);
+            Assert.Equal((int)HttpStatusCode.OK, _okObject.StatusCode);
         }
 
         [Fact]
         public void OrderController_UpdateOrder_ReturnUpdateOrderMessage()
         {
-            OrderAPI _controller = new OrderAPI();
+            IOrderManager orderManager = new OrderManager();
+            OrderAPI _controller = new OrderAPI(orderManager);
 
             Order _order = new Order
             {
@@ -38,7 +78,8 @@ namespace OrderController.Tests
         [Fact]
         public void OrderController_CreateOrder_ReturnCreateOrderMessage()
         {
-            OrderAPI _controller = new OrderAPI();
+            IOrderManager orderManager = new OrderManager();
+            OrderAPI _controller = new OrderAPI(orderManager);
 
             Order _order = new Order
             {
@@ -53,16 +94,6 @@ namespace OrderController.Tests
             Assert.Equal("Order: 123 created", _response);
         }
 
-        [Fact]
-        public void OrderController_CancelOrder_ReturnCancelOrderMessage()
-        {
-            OrderAPI _controller = new OrderAPI();
 
-            int _orderId = 123;
-
-            string _response = _controller.CancelOrder(_orderId);
-
-            Assert.Equal("Order: 123 canceled", _response);
-        }
     }
 }
