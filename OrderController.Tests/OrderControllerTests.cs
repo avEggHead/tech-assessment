@@ -1,11 +1,6 @@
-using System;
 using Xunit;
 using CSharp.Controllers;
-using System.Net.Http;
-using System.Collections.Generic;
-using System.Text.Json;
 using CSharp.Models;
-using System.Text;
 using static CSharp.Models.Order;
 
 namespace OrderController.Tests

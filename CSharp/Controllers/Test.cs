@@ -1,7 +1,8 @@
-﻿namespace CSharp.Controllers
-{
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 
+
+namespace CSharp.Controllers
+{
 	[ApiController]
 	[Route("[controller]")]
 	public class Test : ControllerBase
@@ -9,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 		[HttpGet]
 		public string Get()
 		{
-			return "Gnarly!";
+			return "Success!";
 		}
 	}
 }
